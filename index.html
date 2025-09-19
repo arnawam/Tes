@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Arbitrase Pasar Prediksi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Style untuk number input spinner */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .result-card {
+            transition: all 0.3s ease-in-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+        .result-card.show {
+            max-height: 1000px; /* Cukup besar untuk menampung konten */
+            opacity: 1;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <div class="bg-white max-w-4xl mx-auto p-6 md:p-8 rounded-2xl shadow-lg">
+            
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-4xl font-bold text-slate-900">Kalkulator Arbitrase</h1>
+                <p class="text-slate-500 mt-2">Hitung potensi keuntungan dari perbedaan harga di pasar prediksi.</p>
+            </div>
+
+            <!-- Form Kalkulator -->
+            <form id="arbitrage-form" class="space-y-6">
+                <!-- Input Modal dan Fee -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label for="capital" class="block text-sm font-medium text-slate-700 mb-1">Modal (USD)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">$</span>
+                            <input type="number" id="capital" name="capital" class="w-full pl-7 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="1000" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label for="fee" class="block text-sm font-medium text-slate-700 mb-1">Fee Platform (%)</label>
+                        <div class="relative">
+                            <input type="number" id="fee" name="fee" step="0.1" class="w-full pl-4 pr-7 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="2" required>
+                            <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-500">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="border-slate-200">
+
+                <!-- Input Platform -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <!-- Platform 1 -->
+                    <div class="space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-800">Platform 1</h3>
+                        <div>
+                            <label for="platform1" class="block text-sm font-medium text-slate-700 mb-1">Nama Platform</label>
+                            <select id="platform1" name="platform1" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option>Polymarket</option>
+                                <option>Myriad</option>
+                                <option>Limitless</option>
+                                <option>Lainnya</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="price1" class="block text-sm font-medium text-slate-700 mb-1">Harga Saham</label>
+                             <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">$</span>
+                                <input type="number" id="price1" name="price1" step="0.01" class="w-full pl-7 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0.23" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="option1" class="block text-sm font-medium text-slate-700 mb-1">Opsi</label>
+                            <select id="option1" name="option1" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option value="YES">YES</option>
+                                <option value="NO">NO</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Platform 2 -->
+                    <div class="space-y-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <h3 class="text-lg font-semibold text-slate-800">Platform 2</h3>
+                        <div>
+                            <label for="platform2" class="block text-sm font-medium text-slate-700 mb-1">Nama Platform</label>
+                            <select id="platform2" name="platform2" class="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                <option>Polymarket</option>
+                                <option>Myriad</option>
+                                <option>Limitless</option>
+                                <option>Lainnya</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="price2" class="block text-sm font-medium text-slate-700 mb-1">Harga Saham</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">$</span>
+                                <input type="number" id="price2" name="price2" step="0.01" class="w-full pl-7 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="0.55" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label for="option2" class="block text-sm font-medium text-slate-700 mb-1">Opsi</label>
+                            <select id="option2" name="option2" class="w-full p-2 border border-slate-300 rounded-lg bg-slate-200" disabled>
+                                <option value="YES">YES</option>
+                                <option value="NO">NO</option>
+                            </select>
+                            <p class="text-xs text-slate-500 mt-1">Opsi ini otomatis berlawanan dengan Platform 1.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tombol Hitung -->
+                <div class="pt-4">
+                    <button type="submit" class="w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-300">
+                        Hitung Arbitrase
+                    </button>
+                </div>
+            </form>
+            
+            <!-- Hasil Perhitungan -->
+            <div id="results-container" class="result-card p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                <h2 class="text-2xl font-bold text-slate-900 mb-6 text-center">Hasil Perhitungan</h2>
+                
+                <div id="error-message" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6" role="alert">
+                    <strong class="font-bold">Error!</strong>
+                    <span class="block sm:inline" id="error-text"></span>
+                </div>
+
+                <div id="success-results" class="space-y-6">
+                    <!-- 1. Detail Perhitungan -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3 border-b pb-2 text-blue-800">Detail Perhitungan</h3>
+                        <div class="space-y-2 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Total Biaya per Set:</span>
+                                <span class="font-medium" id="result-total-cost"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Jumlah Set Maksimal:</span>
+                                <span class="font-medium" id="result-max-sets"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Total Dana yang Digunakan:</span>
+                                <span class="font-medium" id="result-total-funds"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Alokasi Dana (Platform 1):</span>
+                                <span class="font-medium" id="result-allocation1"></span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-slate-600">Alokasi Dana (Platform 2):</span>
+                                <span class="font-medium" id="result-allocation2"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. Payout dan Profit -->
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3 border-b pb-2 text-blue-800">Payout dan Profit</h3>
+                        <p class="text-xs text-slate-500 mb-4">Payout kotor diasumsikan $1 per set yang menang. Profit dijamin sama untuk kedua skenario jika biaya per set < $1.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                            <!-- Skenario 1 -->
+                            <div class="bg-white p-4 rounded-lg border">
+                                <h4 class="font-semibold mb-2 text-center" id="scenario1-title">Skenario 1 (Hasil YES)</h4>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between"><span class="text-slate-600">Payout Kotor:</span> <span id="payout1-gross"></span></div>
+                                    <div class="flex justify-between text-red-600"><span class="text-slate-600">Fee Platform:</span> <span id="payout1-fee"></span></div>
+                                    <hr>
+                                    <div class="flex justify-between font-bold"><span class="text-slate-700">Payout Bersih:</span> <span id="payout1-net"></span></div>
+                                    <div class="flex justify-between font-bold text-green-600"><span class="text-slate-700">Profit:</span> <span id="profit1"></span></div>
+                                </div>
+                            </div>
+                            <!-- Skenario 2 -->
+                            <div class="bg-white p-4 rounded-lg border">
+                                <h4 class="font-semibold mb-2 text-center" id="scenario2-title">Skenario 2 (Hasil NO)</h4>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between"><span class="text-slate-600">Payout Kotor:</span> <span id="payout2-gross"></span></div>
+                                    <div class="flex justify-between text-red-600"><span class="text-slate-600">Fee Platform:</span> <span id="payout2-fee"></span></div>
+                                    <hr>
+                                    <div class="flex justify-between font-bold"><span class="text-slate-700">Payout Bersih:</span> <span id="payout2-net"></span></div>
+                                    <div class="flex justify-between font-bold text-green-600"><span class="text-slate-700">Profit:</span> <span id="profit2"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. Ringkasan Kinerja -->
+                    <div class="text-center pt-4">
+                        <h3 class="text-lg font-semibold text-slate-700">Return on Investment (ROI)</h3>
+                        <p class="text-4xl font-bold text-green-700 mt-1" id="result-roi"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Penjelasan dan Disclaimer -->
+            <div class="mt-8 pt-6 border-t border-slate-200 text-sm text-slate-600 space-y-4">
+                <div>
+                    <h3 class="font-semibold text-slate-800 mb-1">Apa itu Arbitrase Pasar Prediksi?</h3>
+                    <p>Arbitrase pasar prediksi adalah strategi untuk mendapatkan keuntungan tanpa risiko dengan memanfaatkan perbedaan harga pada hasil yang berlawanan (misalnya, 'YES' dan 'NO') di satu atau beberapa platform. Jika total harga untuk membeli satu set saham 'YES' dan 'NO' kurang dari $1, maka ada peluang arbitrase yang menjamin keuntungan, terlepas dari hasil akhirnya.</p>
+                </div>
+                <div>
+                    <h3 class="font-semibold text-slate-800 mb-1">Disclaimer</h3>
+                    <p>Perhitungan ini adalah perkiraan berdasarkan data yang Anda masukkan. Angka aktual mungkin sedikit berbeda karena faktor seperti selip harga (slippage), perubahan fee, atau pembulatan. Selalu lakukan riset Anda sendiri sebelum berinvestasi. Investasi di pasar prediksi memiliki risiko.</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('arbitrage-form');
+        const option1Select = document.getElementById('option1');
+        const option2Select = document.getElementById('option2');
+        const resultsContainer = document.getElementById('results-container');
+        const errorMessage = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+        const successResults = document.getElementById('success-results');
+
+        // Fungsi untuk menyinkronkan opsi platform 2
+        function syncOptions() {
+            if (option1Select.value === 'YES') {
+                option2Select.value = 'NO';
+            } else {
+                option2Select.value = 'YES';
+            }
+        }
+        
+        // Event listener untuk perubahan pada opsi 1
+        option1Select.addEventListener('change', syncOptions);
+        
+        // Inisialisasi saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', syncOptions);
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            // Sembunyikan pesan error dan hasil sebelumnya
+            errorMessage.classList.add('hidden');
+            successResults.classList.remove('hidden');
+
+            // Ambil nilai dari form
+            const capital = parseFloat(document.getElementById('capital').value);
+            const feePercent = parseFloat(document.getElementById('fee').value);
+            const price1 = parseFloat(document.getElementById('price1').value);
+            const price2 = parseFloat(document.getElementById('price2').value);
+            const option1 = option1Select.value;
+            const option2 = option2Select.value;
+
+            // Validasi input
+            if (isNaN(capital) || isNaN(feePercent) || isNaN(price1) || isNaN(price2)) {
+                showError("Harap isi semua kolom dengan angka yang valid.");
+                return;
+            }
+             if (capital <= 0 || feePercent < 0 || price1 <= 0 || price2 <= 0) {
+                showError("Nilai modal, fee, dan harga harus positif.");
+                return;
+            }
+
+            const totalCostPerSet = price1 + price2;
+
+            if (totalCostPerSet >= 1) {
+                showError(`Total biaya per set ($${totalCostPerSet.toFixed(2)}) sama atau lebih dari $1. Tidak ada peluang arbitrase. Keuntungan tidak dijamin.`);
+            }
+
+            // --- Mulai Perhitungan ---
+            
+            const fee = feePercent / 100;
+            
+            const maxSets = Math.floor(capital / totalCostPerSet);
+            if (maxSets <= 0) {
+                 showError("Modal tidak cukup untuk membeli satu set saham sekalipun.");
+                 return;
+            }
+            const totalFundsUsed = maxSets * totalCostPerSet;
+
+            const allocation1 = maxSets * price1;
+            const allocation2 = maxSets * price2;
+
+            const grossPayout = maxSets * 1; // Payout adalah $1 per set
+            const feeAmount = grossPayout * fee;
+            const netPayout = grossPayout - feeAmount;
+            
+            const profit = netPayout - totalFundsUsed;
+            const roi = (profit / totalFundsUsed) * 100;
+
+            // --- Tampilkan Hasil ---
+            
+            // Helper untuk format mata uang
+            const formatCurrency = (value) => {
+                return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(value);
+            };
+
+            // Detail
+            document.getElementById('result-total-cost').textContent = formatCurrency(totalCostPerSet);
+            document.getElementById('result-max-sets').textContent = maxSets.toLocaleString('en-US');
+            document.getElementById('result-total-funds').textContent = formatCurrency(totalFundsUsed);
+            document.getElementById('result-allocation1').textContent = formatCurrency(allocation1);
+            document.getElementById('result-allocation2').textContent = formatCurrency(allocation2);
+
+            // Payout
+            document.getElementById('scenario1-title').textContent = `Skenario 1 (Hasil ${option1})`;
+            document.getElementById('payout1-gross').textContent = formatCurrency(grossPayout);
+            document.getElementById('payout1-fee').textContent = `- ${formatCurrency(feeAmount)}`;
+            document.getElementById('payout1-net').textContent = formatCurrency(netPayout);
+            document.getElementById('profit1').textContent = formatCurrency(profit);
+            
+            document.getElementById('scenario2-title').textContent = `Skenario 2 (Hasil ${option2})`;
+            document.getElementById('payout2-gross').textContent = formatCurrency(grossPayout);
+            document.getElementById('payout2-fee').textContent = `- ${formatCurrency(feeAmount)}`;
+            document.getElementById('payout2-net').textContent = formatCurrency(netPayout);
+            document.getElementById('profit2').textContent = formatCurrency(profit);
+
+            // ROI
+            const roiElement = document.getElementById('result-roi');
+            roiElement.textContent = `${roi.toFixed(2)}%`;
+            roiElement.classList.toggle('text-green-700', roi > 0);
+            roiElement.classList.toggle('text-red-700', roi <= 0);
+
+
+            // Tampilkan container hasil dengan animasi
+            resultsContainer.classList.add('show');
+            resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+            successResults.classList.add('hidden');
+            resultsContainer.classList.add('show');
+            resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    </script>
+</body>
+</html>
+
